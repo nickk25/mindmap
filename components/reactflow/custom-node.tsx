@@ -49,7 +49,7 @@ export function CustomNode({
         </Sphere>
         <Html center distanceFactor={5}>
           <Flex
-            className="relative"
+            className="relative group"
             minWidth="100px"
             minHeight="100px"
             align="center"
@@ -71,7 +71,7 @@ export function CustomNode({
             <IconButton
               size="1"
               variant="ghost"
-              className="absolute -right-5 top-0"
+              className="absolute -right-5 top-0 hidden group-hover:block"
               onClick={onDelete}
             >
               <X size={16} />
