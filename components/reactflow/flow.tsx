@@ -1,15 +1,10 @@
 "use client"
 
-import React, { useRef, useState } from "react"
+import React, { Suspense, useState } from "react"
 import { Button } from "@radix-ui/themes"
-import {
-  DragControls,
-  Line,
-  OrbitControls,
-  OrbitControlsProps,
-} from "@react-three/drei"
+import { CameraControls, Line, OrbitControls, Preload } from "@react-three/drei"
 import { Canvas } from "@react-three/fiber"
-import { useDrag } from "@use-gesture/react"
+import * as THREE from "three"
 
 import { CustomNode } from "@/components/reactflow/custom-node"
 
@@ -17,11 +12,8 @@ type Node = {
   id: string
   data: string
   position: [number, number, number]
-}
-
-type Edge = {
-  source: string
-  target: string
+  parentId?: string
+  hidden?: boolean
 }
 
 const initNodes: Node[] = [
@@ -30,49 +22,53 @@ const initNodes: Node[] = [
     data: "Jane Doe",
     position: [0, 0, 0],
   },
-  {
-    id: "2",
-    data: "Tyler Weary",
-    position: [-5, -5, -0],
-  },
-  {
-    id: "3",
-    data: "Kristi Price",
-    position: [5, -5, -0],
-  },
-]
-
-const initEdges: Edge[] = [
-  { source: "1", target: "2" },
-  { source: "1", target: "3" },
 ]
 
 export const Flow = () => {
   const [nodes, setNodes] = useState(initNodes)
-  const [edges, setEdges] = useState(initEdges)
-  const [nodeId, setNodeId] = useState(4)
-  const [enableOrbitControls, setEnableOrbitControls] = useState(true)
+  const [nodeId, setNodeId] = useState(2)
 
-  const addNode = () => {
+  const addNode = (parentId?: string) => {
+    let position: [number, number, number] = [
+      Math.random() * 6 - 3,
+      Math.random() * 6 - 3,
+      Math.random() * 6 - 3,
+    ]
+
+    if (parentId) {
+      const parentNode = nodes.find((node) => node.id === parentId)
+      if (parentNode) {
+        position = [
+          parentNode.position[0] + position[0],
+          parentNode.position[1] + position[1],
+          parentNode.position[2] + position[2],
+        ]
+      }
+    }
     const newNode: Node = {
       id: nodeId.toString(),
-      data: "Nuevo Nodo",
-      position: [
-        Math.random() * 10 - 5,
-        Math.random() * 10 - 5,
-        Math.random() * 10 - 5,
-      ],
+      data: "Nuevo Nodo " + nodeId,
+      position: position,
+      ...(parentId ? { parentId } : {}),
     }
     setNodes((nds) => [...nds, newNode])
-    setEdges((eds) => [...eds, { source: "1", target: newNode.id }])
     setNodeId((id) => id + 1)
   }
 
   const onDelete = (id: string) => {
-    setNodes((nds) => nds.filter((node) => node.id !== id))
-    setEdges((eds) =>
-      eds.filter((edge) => edge.source !== id && edge.target !== id)
-    )
+    const deleteNodeAndChildren = (nodeId: string, nodes: Node[]): Node[] => {
+      const childNodes = nodes.filter((node) => node.parentId === nodeId)
+      let updatedNodes = nodes.filter((node) => node.id !== nodeId)
+
+      childNodes.forEach((child) => {
+        updatedNodes = deleteNodeAndChildren(child.id, updatedNodes)
+      })
+
+      return updatedNodes
+    }
+
+    const updatedNodes = deleteNodeAndChildren(id, nodes)
+    setNodes(updatedNodes)
   }
 
   const onUpdate = (id: string, name: string) => {
@@ -81,41 +77,79 @@ export const Flow = () => {
     )
   }
 
+  const onHide = (id: string) => {
+    const hideNodeAndChildren = (nodeId: string, nodes: Node[]): Node[] => {
+      const childNodes = nodes.filter((node) => node.parentId === nodeId)
+      let updatedNodes = nodes.map((node) =>
+        node.id === nodeId ? { ...node, hidden: true } : node
+      )
+
+      childNodes.forEach((child) => {
+        updatedNodes = hideNodeAndChildren(child.id, updatedNodes)
+      })
+
+      return updatedNodes
+    }
+
+    const updatedNodes = hideNodeAndChildren(id, nodes)
+    setNodes(updatedNodes)
+  }
+
+  const onPositionChange = (id: string, newPosition: THREE.Vector3) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === id
+          ? { ...node, position: [newPosition.x, newPosition.y, newPosition.z] }
+          : node
+      )
+    )
+  }
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      <Button onClick={addNode} style={{ position: "absolute", zIndex: 2 }}>
-        Agregar Nodo
+      <Button
+        onClick={() => addNode("1")}
+        style={{ position: "absolute", zIndex: 2, left: 10 }}
+      >
+        Agregar Nodo Hijo
       </Button>
-      <Canvas style={{ width: "100vw", height: "100vh" }}>
-        <ambientLight intensity={0.2} />
-        <directionalLight color="gray" position={[0, 0, 5]} />
-        <OrbitControls enabled={enableOrbitControls} />
 
-        {nodes.map((node) => (
-          <CustomNode
-            setEnableOrbitControls={setEnableOrbitControls}
-            key={node.id}
-            data={node.data}
-            position={node.position}
-            onDelete={() => onDelete(node.id)}
-            onUpdate={(name) => onUpdate(node.id, name)}
-          />
-        ))}
+      <Button
+        onClick={() => addNode()}
+        style={{ position: "absolute", right: 20, zIndex: 2 }}
+      >
+        Agregar Nodo Padre
+      </Button>
 
-        {edges.map((edge, index) => {
-          const sourceNode = nodes.find((node) => node.id === edge.source)
-          const targetNode = nodes.find((node) => node.id === edge.target)
-          if (!sourceNode || !targetNode) return null
+      <Canvas
+        style={{ width: "100vw", height: "100vh" }}
+        dpr={[1, 2]}
+        camera={{ position: [0, 0, 20], fov: 50 }}
+      >
+        <Suspense fallback={null}>
+          <Preload all />
+          <ambientLight intensity={0.4} />
+          <directionalLight color="yellow" position={[0, 0, 5]} />
 
-          return (
-            <Line
-              key={index}
-              points={[sourceNode.position, targetNode.position]}
-              color="white"
-              lineWidth={1}
-            />
-          )
-        })}
+          <CameraControls makeDefault />
+
+          {nodes.map(
+            (node) =>
+              !node.hidden && (
+                <CustomNode
+                  key={node.id}
+                  data={node.data}
+                  position={node.position}
+                  onDelete={() => onDelete(node.id)}
+                  onUpdate={(name) => onUpdate(node.id, name)}
+                  onPositionChange={(newPosition) =>
+                    onPositionChange(node.id, newPosition)
+                  }
+                  onHide={() => onHide(node.id)}
+                />
+              )
+          )}
+        </Suspense>
       </Canvas>
     </div>
   )

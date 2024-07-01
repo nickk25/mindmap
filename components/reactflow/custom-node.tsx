@@ -1,27 +1,30 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { Flex, IconButton, Text, TextField } from "@radix-ui/themes"
 import { DragControls, Html, Sphere } from "@react-three/drei"
-import { X } from "lucide-react"
+import { Eye, X } from "lucide-react"
+import * as THREE from "three"
 
 export function CustomNode({
   data,
   position,
   onDelete,
   onUpdate,
-
-  setEnableOrbitControls,
+  onPositionChange,
+  onHide,
 }: {
   data: string
   position: [number, number, number]
   onDelete: () => void
   onUpdate: (name: string) => void
-
-  setEnableOrbitControls: (enable: boolean) => void
+  onPositionChange: (position: THREE.Vector3) => void
+  onHide: () => void
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState(data)
+  const ref = useRef(null)
+
   const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value)
     onUpdate(event.target.value)
@@ -31,25 +34,26 @@ export function CustomNode({
     if (event.key === "Enter") {
       setIsEditing(false)
     }
+    if (event.key === "Escape") {
+      setIsEditing(false)
+    }
+  }
+
+  const handleDrag = (e: { elements: number[] }) => {
+    const matrix = new THREE.Matrix4().fromArray(e.elements)
+    const vec = new THREE.Vector3().setFromMatrixPosition(matrix)
+    onPositionChange(vec)
   }
 
   return (
-    <DragControls
-      onDragStart={() => setEnableOrbitControls(false)}
-      onDragEnd={() => setEnableOrbitControls(true)}
-    >
+    <DragControls onDrag={handleDrag} ref={ref} axisLock="z">
       <mesh position={position}>
         <Sphere>
-          <meshPhongMaterial
-            isMaterial
-            polygonOffset
-            polygonOffsetFactor={100}
-            color="hotpink"
-          />
+          <meshPhongMaterial isMaterial wireframe={true} color="hotpink" />
         </Sphere>
         <Html center distanceFactor={5}>
           <Flex
-            className="relative group"
+            className="group relative"
             minWidth="100px"
             minHeight="100px"
             align="center"
@@ -64,7 +68,12 @@ export function CustomNode({
                 style={{ fontWeight: "bold" }}
               />
             ) : (
-              <Text size="8" onClick={() => setIsEditing(true)}>
+              <Text
+                size="8"
+                weight="bold"
+                className="hover:cursor-text"
+                onClick={() => setIsEditing(true)}
+              >
                 {name}
               </Text>
             )}
@@ -75,6 +84,14 @@ export function CustomNode({
               onClick={onDelete}
             >
               <X size={16} />
+            </IconButton>
+            <IconButton
+              size="1"
+              variant="ghost"
+              className="absolute -left-5 top-0 hidden group-hover:block"
+              onClick={onHide}
+            >
+              <Eye size={16} />
             </IconButton>
           </Flex>
         </Html>
