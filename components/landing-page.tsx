@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@radix-ui/themes"
 import {
@@ -11,7 +12,7 @@ import {
   Text,
   useGLTF,
 } from "@react-three/drei"
-import { Canvas } from "@react-three/fiber"
+import { Canvas, useFrame } from "@react-three/fiber"
 
 export const LandingPage = () => {
   const { nodes } = useGLTF("/brain2.glb")
@@ -42,7 +43,7 @@ export const LandingPage = () => {
         Brain
       </Text>
 
-      <Html position={[0, -0.25, 0]}>
+      <Html position={[0, -0.32, 0]}>
         <Button size="4" className="rounded-full" onClick={handleClick}>
           START
         </Button>
@@ -65,18 +66,28 @@ export const LandingPage = () => {
         polar={[0, 0]}
       >
         <Stage environment={"night"} castShadow>
-          <mesh
-            geometry={(nodes as any).mesh.geometry}
-            material={(nodes as any).mesh.material}
-            rotation={[Math.PI / 2, 0, 2.4]}
-          >
-            <meshNormalMaterial wireframe={true} opacity={0.5} />
-          </mesh>
+          <Content />
         </Stage>
       </PresentationControls>
 
       <color attach="background" args={["#f0f0f0"]} />
       <Preload all />
     </Canvas>
+  )
+}
+
+function Content() {
+  const ref = useRef()
+  const { nodes } = useGLTF("/brain2.glb")
+  useFrame(() => (ref.current.rotation.z += 0.01))
+  return (
+    <mesh
+      ref={ref}
+      geometry={(nodes as any).mesh.geometry}
+      material={(nodes as any).mesh.material}
+      rotation={[Math.PI / 2, 0, 2.4]}
+    >
+      <meshNormalMaterial wireframe={true} opacity={0.5} />
+    </mesh>
   )
 }
