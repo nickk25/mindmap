@@ -7,7 +7,7 @@ export function RadixProvider({ children }: { children: ReactNode }) {
       accentColor="purple"
       panelBackground="solid"
       appearance="dark"
-      radius="large"
+      radius="full"
       scaling="90%"
     >
       {children}
