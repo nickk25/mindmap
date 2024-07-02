@@ -24,25 +24,27 @@ export const LandingPage = () => {
   return (
     <Canvas dpr={[1, 2]} camera={{ fov: 45 }} style={{ position: "absolute" }}>
       <Text
-        color="hotpink"
+        color="black"
         scale={0.3}
         position={[-0.1, 0.25, 0]}
         rotation={[0, 0.21, 0]}
+        fontWeight="bold"
       >
         Second
       </Text>
       <Text
-        color="hotpink"
+        color="black"
         scale={0.3}
         position={[0.2, 0, 0]}
         rotation={[0, -0.6, 0]}
+        fontWeight="bold"
       >
         Brain
       </Text>
 
       <Html position={[0, -0.25, 0]}>
         <Button size="4" className="rounded-full" onClick={handleClick}>
-          Start
+          START
         </Button>
       </Html>
 
@@ -68,13 +70,7 @@ export const LandingPage = () => {
             material={(nodes as any).mesh.material}
             rotation={[Math.PI / 2, 0, 2.4]}
           >
-            <meshPhongMaterial
-              attach="material"
-              wireframe={true}
-              color="hotpink"
-              opacity={0.5}
-              reflectivity={0.8}
-            />
+            <meshNormalMaterial wireframe={true} opacity={0.5} />
           </mesh>
         </Stage>
       </PresentationControls>
