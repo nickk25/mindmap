@@ -77,9 +77,13 @@ export const LandingPage = () => {
 }
 
 function Content() {
-  const ref = useRef()
+  const ref = useRef<any | null>(null)
   const { nodes } = useGLTF("/brain2.glb")
-  useFrame(() => (ref.current.rotation.z += 0.01))
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.rotation.z += 0.01
+    }
+  })
   return (
     <mesh
       ref={ref}
