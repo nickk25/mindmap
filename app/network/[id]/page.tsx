@@ -1,12 +1,12 @@
-import { LandingPage } from "@/components/landing-page"
+import { Flow } from "@/components/reactflow/flow"
 
-export default function Home() {
+export default function Network() {
   return (
     <main
-      id="root"
+      id="network"
       className="flex h-screen min-h-screen w-screen flex-col items-center justify-between"
     >
-      <LandingPage />
+      <Flow />
     </main>
   )
 }
