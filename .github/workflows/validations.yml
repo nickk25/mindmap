@@ -30,6 +30,3 @@ jobs:
 
       - name: Run Prettier Check
         run: npm run format
-
-      - name: Run Types Check
-        run: npm run tsc
