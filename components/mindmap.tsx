@@ -5,7 +5,7 @@ import { Bounds, ContactShadows, OrbitControls } from "@react-three/drei"
 import { Canvas } from "@react-three/fiber"
 
 import { Node, useData } from "@/lib/contexts/useData"
-import { NodeModel } from "@/components/node-model"
+import { NodeModel } from "@/components/models/node-model"
 import { SelectToZoom } from "@/components/selecto-to-zoom"
 
 export function Mindmap() {
