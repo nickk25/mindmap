@@ -22,7 +22,11 @@ export const LandingPage = () => {
   }
 
   return (
-    <Canvas dpr={[1, 2]} camera={{ fov: 45 }} style={{ position: "absolute" }}>
+    <Canvas
+      dpr={[1, 2]}
+      camera={{ fov: 45 }}
+      style={{ position: "absolute", height: "100vh", width: "100vw" }}
+    >
       <Text
         color="black"
         scale={0.3}

@@ -16,7 +16,11 @@ export function Mindmap() {
   })
 
   return (
-    <Canvas camera={{ position: [0, -10, 80], fov: 50 }} dpr={[1, 2]}>
+    <Canvas
+      camera={{ position: [0, -10, 80], fov: 50 }}
+      dpr={[1, 2]}
+      style={{ position: "absolute", height: "100vh", width: "100vw" }}
+    >
       <spotLight
         name="spot-light"
         position={[-100, -100, -100]}
