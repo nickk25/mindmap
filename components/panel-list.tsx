@@ -43,7 +43,7 @@ export const PanelList = () => {
         bottom={{ initial: "1", sm: "none" }}
         left={{ initial: "0", sm: "none" }}
       >
-        <Card className="h-[30vh] !w-full md:h-full md:min-w-60 lg:min-w-80">
+        <Card className="h-[30vh] md:h-full md:min-w-60 lg:min-w-80">
           <Text size="2" weight="bold" color="gray">
             Mindmaps
           </Text>
