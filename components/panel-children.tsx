@@ -11,7 +11,7 @@ import {
   TextField,
   Theme,
 } from "@radix-ui/themes"
-import { Check, Eye, EyeOff, Trash } from "lucide-react"
+import { Check, Eye, EyeOff, PenLine, Trash } from "lucide-react"
 
 import { Node, useData } from "@/lib/contexts/useData"
 
@@ -103,6 +103,17 @@ export const PanelChildren = () => {
                   </Text>
                 )}
                 <Flex gap="2" ml="2">
+                  <IconButton
+                    variant="ghost"
+                    size="1"
+                    onClick={() => setIsEditing(node.id)}
+                  >
+                    {isEditing === node.id ? (
+                      <Check className="size-4" />
+                    ) : (
+                      <PenLine className="size-4" />
+                    )}
+                  </IconButton>
                   <IconButton
                     variant="ghost"
                     size="1"
