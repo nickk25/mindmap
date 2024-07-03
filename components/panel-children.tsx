@@ -48,7 +48,11 @@ export const PanelChildren = () => {
       radius="medium"
       className="z-50"
     >
-      <Box position="absolute" top="3" left="6">
+      <Box
+        position="absolute"
+        top={{ initial: "1", sm: "3" }}
+        left={{ initial: "1", sm: "4" }}
+      >
         <Card className="min-w-60 max-w-80">
           <Text size="2" weight="bold" color="gray">
             {currentNode.name}
