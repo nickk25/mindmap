@@ -9,22 +9,35 @@ export function NodeModel({
   position,
   rotation,
   scale,
+  id,
+  visible,
   ...props
 }: {
+  id: string
   name: string
   position: [number, number, number]
   rotation?: [number, number, number]
   scale?: number
   props?: any
+  visible: boolean
 }) {
   return (
     <DragControls>
-      <mesh {...props} position={position} rotation={rotation} scale={scale}>
+      <mesh
+        {...props}
+        position={position}
+        rotation={rotation}
+        scale={scale}
+        visible={visible}
+        name={id}
+      >
         <dodecahedronGeometry />
         <meshStandardMaterial roughness={0.75} emissive="#404057" />
-        <Html distanceFactor={10}>
-          <Text>{name}</Text>
-        </Html>
+        {visible && (
+          <Html distanceFactor={10}>
+            <Text>{name}</Text>
+          </Html>
+        )}
       </mesh>
     </DragControls>
   )
