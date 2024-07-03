@@ -15,6 +15,7 @@ export interface Node {
   visible: boolean
   scale?: number
   children?: Node[]
+  parentId?: string
 }
 
 const initialData: Node[] = [
@@ -93,6 +94,10 @@ const DataContext = createContext<{
   handleDelete: (id: string) => void
   handleCreate: (name: string) => void
   handleUpdate: (id: string, data: Partial<Node>) => void
+  handleCreateChild: (id: string, name: string) => void
+  handleUpdateChild: (parentId: string, id: string, data: Partial<Node>) => void
+  handleDeleteChild: (parentId: string, id: string) => void
+  handleHideChild: (parentId: string, id: string) => void
 }>({
   data: [],
   selectedNodeId: null,
@@ -102,6 +107,10 @@ const DataContext = createContext<{
   handleDelete: () => {},
   handleCreate: () => {},
   handleUpdate: () => {},
+  handleCreateChild: () => {},
+  handleUpdateChild: () => {},
+  handleDeleteChild: () => {},
+  handleHideChild: () => {},
 })
 
 export const DataProvider: React.FC<{ children: ReactNode }> = ({
@@ -196,6 +205,96 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({
     )
   }
 
+  // Children handlers
+  const handleCreateChild = (parentId: string, name: string) => {
+    setData((prev) => {
+      // Map through the existing nodes to find the parent node
+      const newData: Node[] = prev.map((node: Node) => {
+        if (node.id === parentId) {
+          // Create a new child node with a unique id and random position close to parent
+          const newNode: Node = {
+            id: nanoid(),
+            name,
+            position: [
+              node.position[0] + Math.random() * 4 - 2,
+              node.position[1] + Math.random() * 4 - 2,
+              node.position[2] + Math.random() * 4 - 2,
+            ],
+            rotation: node.rotation,
+            visible: true,
+          }
+          // Add the new child node to the parent node's children array
+          return {
+            ...node,
+            children: [...(node.children || []), newNode],
+          }
+        }
+        // If the current node is not the parent, return it as is
+        return node
+      })
+      // Return the updated state with the new child node
+      return newData
+    })
+  }
+
+  const handleUpdateChild = (
+    parentId: string,
+    id: string,
+    data: Partial<Node>
+  ) => {
+    setData((prev) => {
+      return prev.map((node) => {
+        // Check if the current node is the parent node and has children
+        if (node.id === parentId && node.children) {
+          // Update the specific child node
+          const updatedChildren = node.children.map((child) =>
+            child.id === id ? { ...child, ...data } : child
+          )
+          // Return the parent node with updated children
+          return { ...node, children: updatedChildren }
+        }
+        // Return the node as is if it's not the parent node
+        return node
+      })
+    })
+  }
+
+  const handleDeleteChild = (parentId: string, id: string) => {
+    setData((prev) => {
+      return prev.map((node) => {
+        // Check if the current node is the parent node and has children
+        if (node.id === parentId && node.children) {
+          // Filter out the child node to be deleted
+          const updatedChildren = node.children.filter(
+            (child) => child.id !== id
+          )
+          // Return the parent node with updated children
+          return { ...node, children: updatedChildren }
+        }
+        // Return the node as is if it's not the parent node
+        return node
+      })
+    })
+  }
+
+  const handleHideChild = (parentId: string, id: string) => {
+    setData((prev) => {
+      return prev.map((node) => {
+        // Check if the current node is the parent node and has children
+        if (node.id === parentId && node.children) {
+          // Toggle the visibility of the specific child node
+          const updatedChildren = node.children.map((child) =>
+            child.id === id ? { ...child, visible: !child.visible } : child
+          )
+          // Return the parent node with updated children
+          return { ...node, children: updatedChildren }
+        }
+        // Return the node as is if it's not the parent node
+        return node
+      })
+    })
+  }
+
   return (
     <DataContext.Provider
       value={{
@@ -207,6 +306,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({
         handleDelete,
         handleCreate,
         handleUpdate,
+        handleCreateChild,
+        handleUpdateChild,
+        handleDeleteChild,
+        handleHideChild,
       }}
     >
       {children}
