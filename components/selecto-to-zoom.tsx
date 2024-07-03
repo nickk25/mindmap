@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react"
 import { Preload, useBounds } from "@react-three/drei"
 import { useFrame, useThree } from "@react-three/fiber"
+import * as THREE from "three"
 
 import { useData } from "@/lib/contexts/useData"
 
@@ -13,13 +14,21 @@ export function SelectToZoom({ children }: { children: React.ReactNode }) {
   const ref = useRef<any | null>(null)
 
   useEffect(() => {
-    const node = state
-      .find((node) => node.name === "")
-      ?.children[0]?.children?.find((node) => {
-        if (node?.children[0]?.name === selectedNodeId) {
-          return node?.children[0]
+    // This makes it possible to navigate from the panel
+    const findMesh = (nodes: THREE.Object3D[]): THREE.Mesh | null => {
+      for (const node of nodes) {
+        if (node.type === "Mesh" && node.name === selectedNodeId) {
+          return node as THREE.Mesh
         }
-      })
+        if (node.children) {
+          const found = findMesh(node.children as THREE.Object3D[])
+          if (found) return found
+        }
+      }
+      return null
+    }
+
+    const node = findMesh(state as THREE.Object3D[])
 
     if (node) {
       api.refresh(node).fit()
