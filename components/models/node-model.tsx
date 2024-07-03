@@ -28,6 +28,7 @@ export function NodeModel({
   return (
     <group name="node-group">
       {children &&
+        visible &&
         children.map((child: Node) => (
           <NodeModel key={child.id} {...child} scale={0.5} />
         ))}
