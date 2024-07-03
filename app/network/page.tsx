@@ -1,6 +1,6 @@
+import { Mindmap } from "@/components/mindmap"
 import { PanelChildren } from "@/components/panel-children"
 import { PanelList } from "@/components/panel-list"
-import { Flow } from "@/components/reactflow/flow"
 
 export default function Network() {
   return (
@@ -10,7 +10,7 @@ export default function Network() {
     >
       <PanelList />
       <PanelChildren />
-      <Flow />
+      <Mindmap />
     </main>
   )
 }
