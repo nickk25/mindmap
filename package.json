@@ -12,6 +12,8 @@
     "format": "prettier \"**/*.{css,js,json,jsx,ts,tsx}\" --cache"
   },
   "dependencies": {
+    "@clerk/nextjs": "^5.2.1",
+    "@clerk/themes": "^2.1.10",
     "@ianvs/prettier-plugin-sort-imports": "^4.3.0",
     "@radix-ui/themes": "^3.1.1",
     "@react-three/drei": "^9.108.1",
