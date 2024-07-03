@@ -5,7 +5,7 @@ export function RadixProvider({ children }: { children: ReactNode }) {
   return (
     <Theme
       accentColor="gray"
-      panelBackground="solid"
+      panelBackground="translucent"
       appearance="dark"
       radius="full"
       scaling="90%"

@@ -1,11 +1,13 @@
 "use client"
 
 import { useState } from "react"
+import { UserButton } from "@clerk/nextjs"
 import {
   Box,
   Button,
   Card,
   Flex,
+  Heading,
   IconButton,
   ScrollArea,
   Text,
@@ -30,12 +32,7 @@ export const PanelList = () => {
   const [newNodeName, setNewNodeName] = useState("")
 
   return (
-    <Theme
-      accentColor="gray"
-      panelBackground="translucent"
-      radius="medium"
-      className="z-50"
-    >
+    <Theme radius="large" className="z-50">
       <Box
         position="absolute"
         top={{ sm: "3" }}
@@ -44,10 +41,13 @@ export const PanelList = () => {
         left={{ initial: "0", sm: "none" }}
       >
         <Card className="h-[30vh] md:h-full md:min-w-60 lg:min-w-80">
-          <Text size="2" weight="bold" color="gray">
-            Mindmaps
-          </Text>
-          <ScrollArea>
+          <Flex align="center" justify="between" mb="3">
+            <Heading size="4" weight="bold">
+              Mindmaps
+            </Heading>
+            <UserButton />
+          </Flex>
+          <ScrollArea scrollbars="vertical">
             {data &&
               data?.map((node) => (
                 <div
@@ -81,7 +81,6 @@ export const PanelList = () => {
                     ></TextField.Root>
                   ) : (
                     <Text
-                      color="gray"
                       onClick={() => {
                         selectNode(node.id)
                       }}
@@ -151,7 +150,6 @@ export const PanelList = () => {
             )}
 
             <Button
-              color="gray"
               variant="ghost"
               className="mb-8 mt-4 w-full md:mb-0"
               onClick={() => (setIsCreating(!isCreating), setNewNodeName(""))}
