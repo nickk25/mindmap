@@ -26,13 +26,13 @@ export function NodeModel({
   children?: Node[]
 }) {
   return (
-    <group name="node-group">
-      {children &&
-        visible &&
-        children.map((child: Node) => (
-          <NodeModel key={child.id} {...child} scale={0.5} />
-        ))}
-      <DragControls>
+    <DragControls>
+      <group name="node-group">
+        {children &&
+          visible &&
+          children.map((child: Node) => (
+            <NodeModel key={child.id} {...child} scale={0.5} />
+          ))}
         <mesh
           {...props}
           position={position}
@@ -49,7 +49,7 @@ export function NodeModel({
             </Html>
           )}
         </mesh>
-      </DragControls>
-    </group>
+      </group>
+    </DragControls>
   )
 }
